@@ -30,18 +30,31 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
   }, [clips]);
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
+    if (!navigator.canShare) {
+      alert("Sharing not supported on this device");
+      return;
+    }
+
+    try {
+      // Fetch the video as a blob
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+
+      // Create a File object
+      const file = new File([blob], 'video.mp4', { type: 'video/mp4' });
+
+      // Check if file sharing is supported
+      if (navigator.canShare({ files: [file] })) {
         await navigator.share({
+          files: [file],
           title: 'My Vireo Story',
           text: 'Check out this video I made with Vireo! #MainCharacterEnergy',
-          url: window.location.href,
         });
-      } catch (err) {
-        console.log('Share canceled');
+      } else {
+        alert("File sharing not supported");
       }
-    } else {
-      alert("Sharing is only supported on mobile devices or secure contexts! (Imagine an Instagram modal opening here)");
+    } catch (err) {
+      console.log('Share failed:', err);
     }
   };
 
