@@ -67,6 +67,7 @@ const App: React.FC = () => {
 
       } catch (error) {
         console.error("Error processing video:", error);
+        const _ = await api.logError(error);
         alert("Failed to start video generation. Please try again.");
         setIsProcessing(false);
       }

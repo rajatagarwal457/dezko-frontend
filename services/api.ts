@@ -52,6 +52,23 @@ export const api = {
         return response.json();
     },
 
+    async logError(error: Error): Promise<{ message: string }> {
+        const body = { error: error.message };
+        const response = await fetch(`${API_BASE_URL}/error`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error logging failed: ${response.statusText}`);
+        }
+
+        return response.json();
+    },
+
     async getSongs(): Promise<Song[]> {
         const response = await fetch(`${API_BASE_URL}/songs`);
 
