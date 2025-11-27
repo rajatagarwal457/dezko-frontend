@@ -16,7 +16,7 @@ export interface GenerateResponse {
 }
 
 export const api = {
-    async uploadVideos(files: File[]): Promise<{ message: string; files: string[] }> {
+    async uploadVideos(files: File[]): Promise<{ message: string; files: string[]; session_id: string }> {
         const formData = new FormData();
         files.forEach((file) => {
             formData.append('files', file);
@@ -34,8 +34,8 @@ export const api = {
         return response.json();
     },
 
-    async generateVideo(songId?: string): Promise<GenerateResponse> {
-        const body = songId ? { song_id: songId } : {};
+    async generateVideo(sessionId: string): Promise<GenerateResponse> {
+        const body = { session_id: sessionId };
         const response = await fetch(`${API_BASE_URL}/generate`, {
             method: 'POST',
             headers: {
