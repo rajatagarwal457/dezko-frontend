@@ -39,18 +39,6 @@ const App: React.FC = () => {
     }
     setUploadedClips(clips);
 
-    // Create render entry immediately with a temporary filename
-    // const renderId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const tempRender: VideoRender = {
-      id: renderId,
-      filename: `pending_${renderId}.mp4`, // Temporary filename
-      status: 'generating',
-      createdAt: Date.now(),
-      clipNames: clips.map(c => c.name),
-      userId: user.id
-    };
-    videoStore.saveVideoRender(tempRender);
-
     // Redirect to Dashboard immediately
     setCurrentState(AppState.DASHBOARD);
 
@@ -63,21 +51,21 @@ const App: React.FC = () => {
 
         // 2. Generate Video (backend returns immediately with filename)
         const result = await api.generateVideo();
-        // const renderId = result.filename;
-        const tempRender: VideoRender = {
+
+        // 3. Save render with actual filename
+        const render: VideoRender = {
           id: result.filename,
-          filename: `${result.filename}.mp4`, // Temporary filename
+          filename: result.filename,
           status: 'generating',
           createdAt: Date.now(),
           clipNames: clips.map(c => c.name),
           userId: user.id
         };
-        videoStore.saveVideoRender(tempRender);
-        // 3. Update render with actual filename
+        videoStore.saveVideoRender(render);
 
       } catch (error) {
         console.error("Error processing video:", error);
-        // videoStore.updateVideoStatus(renderId, 'failed');
+        alert("Failed to start video generation. Please try again.");
       }
     })();
   };
