@@ -47,7 +47,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ onCreateNew, onViewVideo 
 
             if (status.ready) {
                 videoStore.updateVideoStatus(renderId, 'completed');
-                const _ = api.clearUploads();
+                // const _ = api.clearUploads();
                 loadRenders();
                 clearInterval(pollInterval);
                 setPollingIds(prev => {

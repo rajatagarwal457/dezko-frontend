@@ -15,6 +15,7 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
   const [showAd, setShowAd] = useState(false);
   const [adTimer, setAdTimer] = useState(AD_DURATION_SEC);
   const [videoTitle, setVideoTitle] = useState("Your Vireo Story");
+  const [cachedVideoBlob, setCachedVideoBlob] = useState<Blob | null>(null);
 
   // Determine the source to play. Use the generated video URL if available, otherwise fallback to first clip (shouldn't happen in real flow)
   const previewSource = videoUrl || (clips.length > 0 ? clips[0].previewUrl : '');
@@ -29,6 +30,16 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
     fetchTitle();
   }, [clips]);
 
+  // Cache the video blob when component mounts
+  useEffect(() => {
+    if (videoUrl && !cachedVideoBlob) {
+      fetch(videoUrl)
+        .then(res => res.blob())
+        .then(blob => setCachedVideoBlob(blob))
+        .catch(err => console.error('Failed to cache video:', err));
+    }
+  }, [videoUrl, cachedVideoBlob]);
+
   const handleShare = async () => {
     if (!navigator.canShare) {
       alert("Sharing not supported on this device");
@@ -36,12 +47,18 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
     }
 
     try {
-      // Fetch the video as a blob
-      const response = await fetch(videoUrl);
-      const blob = await response.blob();
+      let blob: Blob;
+
+      // Use cached blob if available, otherwise fetch
+      if (cachedVideoBlob) {
+        blob = cachedVideoBlob;
+      } else {
+        const response = await fetch(videoUrl);
+        blob = await response.blob();
+      }
 
       // Create a File object
-      const file = new File([blob], 'video.mp4', { type: 'video/mp4' });
+      const file = new File([blob], 'vireo_video.mp4', { type: 'video/mp4' });
 
       // Check if file sharing is supported
       if (navigator.canShare({ files: [file] })) {
