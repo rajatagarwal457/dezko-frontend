@@ -48,8 +48,6 @@ const App: React.FC = () => {
         const uploadResult = await api.uploadVideos(files);
 
         // Upload complete - redirect to Dashboard immediately
-        setCurrentState(AppState.DASHBOARD);
-        setIsProcessing(false);
 
         // 2. Generate Video (backend returns immediately with filename)
         const result = await api.generateVideo(uploadResult.session_id);
@@ -64,6 +62,9 @@ const App: React.FC = () => {
           userId: user.id
         };
         videoStore.saveVideoRender(render);
+        setCurrentState(AppState.DASHBOARD);
+        setIsProcessing(false);
+
       } catch (error) {
         console.error("Error processing video:", error);
         alert("Failed to start video generation. Please try again.");
