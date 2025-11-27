@@ -112,8 +112,8 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
         <p className="text-gray-500 dark:text-gray-400">Your story is ready to fly.</p>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-vireo-teal p-2 md:p-4 mb-8 dark:bg-gray-800 dark:border-vireo-teal/50">
-        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden group">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-4 border-vireo-teal dark:border-vireo-teal/50 p-2 md:p-4 mb-8 max-w-md mx-auto">
+        <div className="relative aspect-[9/16] bg-black rounded-2xl overflow-hidden group">
           <video
             src={previewSource}
             className="w-full h-full object-contain"
