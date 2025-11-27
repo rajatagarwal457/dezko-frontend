@@ -35,12 +35,13 @@ const App: React.FC = () => {
     if (!isLoaded) return;
     if (!isSignedIn || !user) {
       alert("Please sign in to upload videos.");
+      setIsProcessing(true);
+
       return;
     }
     setUploadedClips(clips);
-
     // Redirect to Dashboard immediately
-    setCurrentState(AppState.DASHBOARD);
+    // setCurrentState(AppState.DASHBOARD);
 
     // Upload and generate in background
     (async () => {
@@ -62,6 +63,8 @@ const App: React.FC = () => {
           userId: user.id
         };
         videoStore.saveVideoRender(render);
+        setIsProcessing(false);
+        setCurrentState(AppState.DASHBOARD);
       } catch (error) {
         console.error("Error processing video:", error);
         alert("Failed to start video generation. Please try again.");
