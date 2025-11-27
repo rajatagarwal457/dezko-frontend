@@ -8,9 +8,10 @@ import { UploadCloud, Film, X, Plus } from 'lucide-react';
 interface LandingViewProps {
   onStartProcessing: (clips: UploadedClip[]) => void;
   isSignedIn?: boolean | undefined;
+  isProcessing?: boolean;
 }
 
-const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn }) => {
+const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn, isProcessing = false }) => {
   const [clips, setClips] = useState<UploadedClip[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -180,8 +181,9 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
           variant="primary"
           className="text-xl px-12 py-5 shadow-vireo-pink/40 shadow-xl"
           onClick={() => onStartProcessing(clips)}
+          disabled={isProcessing}
         >
-          Make me the main character ✨
+          {isProcessing ? 'Starting generation...' : 'Make me the main character ✨'}
         </Button>
       </div>
 

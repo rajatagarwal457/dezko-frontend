@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
-import { Moon, Sun } from 'lucide-react';
-import { AppState, UploadedClip } from './types';
+import { Moon, Sun, LayoutDashboard } from 'lucide-react';
+import { AppState, UploadedClip, VideoRender } from './types';
 import LandingView from './components/LandingView';
 import ProcessingView from './components/ProcessingView';
 import ResultView from './components/ResultView';
+import DashboardView from './components/DashboardView';
 import VireoBird from './components/VireoBird';
 import { api } from './services/api';
+import { videoStore } from './services/videoStore';
 
 const App: React.FC = () => {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const [currentState, setCurrentState] = useState<AppState>(AppState.LANDING);
   const [uploadedClips, setUploadedClips] = useState<UploadedClip[]>([]);
   const [outputVideoUrl, setOutputVideoUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [currentRender, setCurrentRender] = useState<VideoRender | null>(null);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -30,31 +33,36 @@ const App: React.FC = () => {
 
   const handleStartProcessing = async (clips: UploadedClip[]) => {
     if (!isLoaded) return;
-    if (!isSignedIn) {
+    if (!isSignedIn || !user) {
       alert("Please sign in to upload videos.");
       return;
     }
     setUploadedClips(clips);
-    setCurrentState(AppState.PROCESSING);
-    setIsProcessing(true);
 
     try {
       // 1. Upload Videos
       const files = clips.map(c => c.file);
       await api.uploadVideos(files);
-
-      // 2. Generate Video
+      setIsProcessing(true);
+      // 2. Generate Video (backend returns immediately with filename)
       const result = await api.generateVideo();
-      const videoUrl = api.getVideoUrl(result.filename);
-      setOutputVideoUrl(videoUrl);
 
-      // 3. Move to Result View
-      // Note: We could wait for ProcessingView animation here if we wanted to enforce a minimum time
-      setCurrentState(AppState.RESULT);
-      const _ = api.clearUploads();
+      // 3. Save to storage as 'generating'
+      const render: VideoRender = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        filename: result.filename,
+        status: 'generating',
+        createdAt: Date.now(),
+        clipNames: clips.map(c => c.name),
+        userId: user.id
+      };
+      videoStore.saveVideoRender(render);
+
+      // 4. Redirect to Dashboard
+      setCurrentState(AppState.DASHBOARD);
     } catch (error) {
       console.error("Error processing video:", error);
-      alert("Failed to generate video. Please try again.");
+      alert("Failed to start video generation. Please try again.");
       setCurrentState(AppState.LANDING);
     } finally {
       setIsProcessing(false);
@@ -73,6 +81,21 @@ const App: React.FC = () => {
     uploadedClips.forEach(clip => URL.revokeObjectURL(clip.previewUrl));
     setUploadedClips([]);
     setOutputVideoUrl(null);
+    setCurrentRender(null);
+    setCurrentState(AppState.LANDING);
+  };
+
+  const handleViewVideo = (render: VideoRender) => {
+    setCurrentRender(render);
+    setOutputVideoUrl(api.getVideoUrl(render.filename));
+    setCurrentState(AppState.RESULT);
+  };
+
+  const handleGoToDashboard = () => {
+    setCurrentState(AppState.DASHBOARD);
+  };
+
+  const handleCreateNew = () => {
     setCurrentState(AppState.LANDING);
   };
 
@@ -99,6 +122,16 @@ const App: React.FC = () => {
           >
             {isDarkMode ? <Sun className="w-6 h-6 text-yellow-400" /> : <Moon className="w-6 h-6 text-vireo-dark" />}
           </button>
+          <SignedIn>
+            <button
+              onClick={handleGoToDashboard}
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Go to Dashboard"
+              title="Dashboard"
+            >
+              <LayoutDashboard className="w-6 h-6 text-vireo-dark dark:text-white" />
+            </button>
+          </SignedIn>
           <SignedOut>
             <SignInButton mode="modal">
               <button className="px-4 py-2 bg-vireo-teal text-white rounded-lg font-bold hover:bg-opacity-90 transition-all">
@@ -119,11 +152,19 @@ const App: React.FC = () => {
           <LandingView
             onStartProcessing={handleStartProcessing}
             isSignedIn={isSignedIn}
+            isProcessing={isProcessing}
           />
         )}
 
         {currentState === AppState.PROCESSING && (
           <ProcessingView onComplete={handleProcessingComplete} />
+        )}
+
+        {currentState === AppState.DASHBOARD && (
+          <DashboardView
+            onCreateNew={handleCreateNew}
+            onViewVideo={handleViewVideo}
+          />
         )}
 
         {currentState === AppState.RESULT && (

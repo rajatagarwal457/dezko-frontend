@@ -8,5 +8,5 @@ export const PROCESSING_MESSAGES = [
 
 export const MAX_FILE_SIZE_MB = 200;
 export const MAX_CLIPS = 10;
-export const PROCESSING_DURATION_MS = 60000;
+export const PROCESSING_DURATION_MS = 600;
 export const AD_DURATION_SEC = 15;

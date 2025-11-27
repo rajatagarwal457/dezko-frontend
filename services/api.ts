@@ -74,6 +74,19 @@ export const api = {
         return response.json();
     },
 
+    async checkVideoStatus(filename: string): Promise<{ exists: boolean; ready: boolean }> {
+        try {
+            const videoUrl = this.getVideoUrl(filename);
+            const response = await fetch(videoUrl, { method: 'HEAD' });
+            return {
+                exists: response.ok,
+                ready: response.ok
+            };
+        } catch (error) {
+            return { exists: false, ready: false };
+        }
+    },
+
     getVideoUrl(filename: string): string {
         return `${API_BASE_URL}/outputs/${filename}`;
     },
