@@ -62,8 +62,6 @@ const App: React.FC = () => {
           userId: user.id
         };
         videoStore.saveVideoRender(render);
-        //refresh dashboard
-        setCurrentState(AppState.DASHBOARD);
       } catch (error) {
         console.error("Error processing video:", error);
         alert("Failed to start video generation. Please try again.");
