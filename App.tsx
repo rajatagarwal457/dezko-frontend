@@ -40,7 +40,7 @@ const App: React.FC = () => {
     setUploadedClips(clips);
 
     // Create render entry immediately with a temporary filename
-    const renderId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // const renderId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const tempRender: VideoRender = {
       id: renderId,
       filename: `pending_${renderId}.mp4`, // Temporary filename
@@ -63,19 +63,21 @@ const App: React.FC = () => {
 
         // 2. Generate Video (backend returns immediately with filename)
         const result = await api.generateVideo();
-
-        // 3. Update render with actual filename
-        const updatedRender: VideoRender = {
-          ...tempRender,
-          filename: result.filename
+        // const renderId = result.filename;
+        const tempRender: VideoRender = {
+          id: result.filename,
+          filename: `${result.filename}.mp4`, // Temporary filename
+          status: 'generating',
+          createdAt: Date.now(),
+          clipNames: clips.map(c => c.name),
+          userId: user.id
         };
+        videoStore.saveVideoRender(tempRender);
+        // 3. Update render with actual filename
 
-        // Remove temp render and add updated one
-        videoStore.deleteVideoRender(renderId);
-        videoStore.saveVideoRender(updatedRender);
       } catch (error) {
         console.error("Error processing video:", error);
-        videoStore.updateVideoStatus(renderId, 'failed');
+        // videoStore.updateVideoStatus(renderId, 'failed');
       }
     })();
   };
