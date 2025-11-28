@@ -26,4 +26,5 @@ export interface VideoRender {
   createdAt: number;
   clipNames: string[];
   userId: string;
+  videoUrl?: string;
 }

@@ -59,7 +59,8 @@ const App: React.FC = () => {
           status: 'generating',
           createdAt: Date.now(),
           clipNames: clips.map(c => c.name),
-          userId: user.id
+          userId: user.id,
+          videoUrl: result.video_url
         };
         videoStore.saveVideoRender(render);
         setCurrentState(AppState.DASHBOARD);
@@ -92,7 +93,7 @@ const App: React.FC = () => {
 
   const handleViewVideo = (render: VideoRender) => {
     setCurrentRender(render);
-    setOutputVideoUrl(api.getVideoUrl(render.filename));
+    setOutputVideoUrl(render.videoUrl || api.getVideoUrl(render.filename));
     setCurrentState(AppState.RESULT);
   };
 

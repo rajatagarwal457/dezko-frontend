@@ -16,9 +16,12 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
   const [adTimer, setAdTimer] = useState(AD_DURATION_SEC);
   const [videoTitle, setVideoTitle] = useState("Your Vireo Story");
   const [cachedVideoBlob, setCachedVideoBlob] = useState<Blob | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Determine the source to play. Use the generated video URL if available, otherwise fallback to first clip (shouldn't happen in real flow)
-  const previewSource = videoUrl || (clips.length > 0 ? clips[0].previewUrl : '');
+  // Determine the source to play. Use blob URL if available, otherwise fallback
+  const previewSource = blobUrl || videoUrl || (clips.length > 0 ? clips[0].previewUrl : '');
 
   useEffect(() => {
     // Generate a creative title using Gemini (or fallback)
@@ -30,15 +33,52 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
     fetchTitle();
   }, [clips]);
 
-  // Cache the video blob when component mounts
+  // Cache the video blob when component mounts and create blob URL
   useEffect(() => {
-    if (videoUrl && !cachedVideoBlob) {
-      fetch(videoUrl)
-        .then(res => res.blob())
-        .then(blob => setCachedVideoBlob(blob))
-        .catch(err => console.error('Failed to cache video:', err));
+    if (videoUrl && !cachedVideoBlob && !isLoading) {
+      setIsLoading(true);
+      setLoadingProgress(0);
+
+      // Use XMLHttpRequest to track download progress
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', videoUrl, true);
+      xhr.responseType = 'blob';
+
+      xhr.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = (event.loaded / event.total) * 100;
+          setLoadingProgress(progress);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const blob = xhr.response;
+          setCachedVideoBlob(blob);
+          const url = URL.createObjectURL(blob);
+          setBlobUrl(url);
+          setLoadingProgress(100);
+          setIsLoading(false);
+        }
+      };
+
+      xhr.onerror = () => {
+        console.error('Failed to download video');
+        setIsLoading(false);
+      };
+
+      xhr.send();
     }
-  }, [videoUrl, cachedVideoBlob]);
+  }, [videoUrl, cachedVideoBlob, isLoading]);
+
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [blobUrl]);
 
   const handleShare = async () => {
     if (!navigator.canShare) {
@@ -114,14 +154,30 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
 
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-4 border-vireo-teal dark:border-vireo-teal/50 p-2 md:p-4 mb-8 max-w-md mx-auto">
         <div className="relative aspect-[9/16] bg-black rounded-2xl overflow-hidden group">
-          <video
-            src={previewSource}
-            className="w-full h-full object-contain"
-            controls
-            autoPlay
-            loop
-            playsInline
-          />
+          {isLoading ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+              <div className="w-16 h-16 mb-4">
+                <Play className="w-full h-full text-vireo-teal animate-pulse" />
+              </div>
+              <p className="text-white font-semibold mb-3">Loading your video...</p>
+              <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-vireo-pink to-vireo-teal transition-all duration-300 ease-out"
+                  style={{ width: `${loadingProgress}%` }}
+                />
+              </div>
+              <p className="text-gray-400 text-sm mt-2">{Math.round(loadingProgress)}%</p>
+            </div>
+          ) : (
+            <video
+              src={previewSource}
+              className="w-full h-full object-contain"
+              controls
+              autoPlay
+              loop
+              playsInline
+            />
+          )}
           {/* Overlay Title */}
 
         </div>

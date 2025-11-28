@@ -91,9 +91,9 @@ export const api = {
         return response.json();
     },
 
-    async checkVideoStatus(filename: string): Promise<{ exists: boolean; ready: boolean }> {
+    async checkVideoStatus(filename: string, url?: string): Promise<{ exists: boolean; ready: boolean }> {
         try {
-            const videoUrl = this.getVideoUrl(filename);
+            const videoUrl = url || this.getVideoUrl(filename);
             const response = await fetch(videoUrl, { method: 'HEAD' });
             return {
                 exists: response.ok,

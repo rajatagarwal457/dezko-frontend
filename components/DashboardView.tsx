@@ -32,18 +32,18 @@ const DashboardView: React.FC<DashboardViewProps> = ({ onCreateNew, onViewVideo 
         // Start polling for generating videos
         userRenders.forEach(render => {
             if (render.status === 'generating') {
-                startPolling(render.id, render.filename);
+                startPolling(render.id, render.filename, render.videoUrl);
             }
         });
     };
 
-    const startPolling = (renderId: string, filename: string) => {
+    const startPolling = (renderId: string, filename: string, videoUrl?: string) => {
         if (pollingIds.has(renderId)) return;
 
         setPollingIds(prev => new Set(prev).add(renderId));
 
         const pollInterval = setInterval(async () => {
-            const status = await api.checkVideoStatus(filename);
+            const status = await api.checkVideoStatus(filename, videoUrl);
 
             if (status.ready) {
                 videoStore.updateVideoStatus(renderId, 'completed');
