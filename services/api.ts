@@ -1,5 +1,4 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-
 export interface Song {
     id: string;
     name: string;
@@ -16,26 +15,68 @@ export interface GenerateResponse {
 }
 
 export const api = {
-    async uploadVideos(files: File[]): Promise<{ message: string; files: string[]; session_id: string }> {
-        const formData = new FormData();
-        files.forEach((file) => {
-            formData.append('files', file);
-        });
-
-        const response = await fetch(`${API_BASE_URL}/upload`, {
+    async getUploadUrl(sessionId: string, filename: string, contentType: string): Promise<{ upload_url: string; key: string }> {
+        const response = await fetch(`${API_BASE_URL}/get-upload-url`, {
             method: 'POST',
-            body: formData,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                filename: filename,
+                content_type: contentType
+            }),
         });
 
         if (!response.ok) {
-            throw new Error(`Upload failed: ${response.statusText}`);
+            throw new Error(`Failed to get upload URL: ${response.statusText}`);
         }
 
         return response.json();
     },
 
-    async generateVideo(sessionId: string): Promise<GenerateResponse> {
-        const body = { session_id: sessionId };
+    async uploadVideos(files: File[], userId: string): Promise<{ message: string; files: string[]; session_id: string }> {
+        // 1. Generate Session ID: {userId}-{uuid}
+        const uuid = crypto.randomUUID();
+        const sessionId = `${userId}-${uuid}`;
+
+        // 2. Upload each file using Presigned URL
+        const uploadPromises = files.map(async (file) => {
+            const filename = file.name;
+
+            // A. Get Presigned URL from Backend
+            const { upload_url } = await this.getUploadUrl(sessionId, filename, file.type);
+
+            // B. Upload directly to S3 using the signed URL
+            const response = await fetch(upload_url, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Content-Type': file.type,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Upload failed for ${filename}: ${response.statusText}`);
+            }
+
+            return filename;
+        });
+
+        const uploadedFiles = await Promise.all(uploadPromises);
+
+        return {
+            message: "Uploads successful",
+            files: uploadedFiles,
+            session_id: sessionId
+        };
+    },
+
+    async generateVideo(sessionId: string, fileNames: string[]): Promise<GenerateResponse> {
+        const body = {
+            session_id: sessionId,
+            files: fileNames
+        };
         const response = await fetch(`${API_BASE_URL}/generate`, {
             method: 'POST',
             headers: {

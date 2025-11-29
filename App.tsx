@@ -45,12 +45,12 @@ const App: React.FC = () => {
       try {
         // 1. Upload Videos
         const files = clips.map(c => c.file);
-        const uploadResult = await api.uploadVideos(files);
+        const uploadResult = await api.uploadVideos(files, user.id);
 
         // Upload complete - redirect to Dashboard immediately
 
         // 2. Generate Video (backend returns immediately with filename)
-        const result = await api.generateVideo(uploadResult.session_id);
+        const result = await api.generateVideo(uploadResult.session_id, uploadResult.files);
 
         // 3. Save render with actual filename
         const render: VideoRender = {
