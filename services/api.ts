@@ -22,7 +22,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                session_id: sessionId,
+                sessionId: sessionId,
                 filename: filename,
                 content_type: contentType
             }),
@@ -74,8 +74,8 @@ export const api = {
 
     async generateVideo(sessionId: string, fileNames: string[]): Promise<GenerateResponse> {
         const body = {
-            session_id: sessionId,
-            files: fileNames
+            sessionId: sessionId,
+            fileNames: fileNames
         };
         const response = await fetch(`${API_BASE_URL}/generate`, {
             method: 'POST',
