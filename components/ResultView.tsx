@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UploadedClip } from '../types';
 import Button from './Button';
 import { AD_DURATION_SEC } from '../constants';
-import { Share2, Download, Check, Play, X } from 'lucide-react';
+import { Share2, Download, Check } from 'lucide-react';
 import { generateCreativeTitle } from '../services/geminiService';
 
 interface ResultViewProps {
@@ -158,8 +158,9 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
 
             <div className="text-center py-8">
               <p className="text-gray-400 text-xs uppercase tracking-widest font-bold mb-4">Advertisement</p>
-              <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center mb-6 border-2 border-dashed border-gray-300 dark:bg-gray-700 dark:border-gray-600">
-                <span className="text-gray-400 dark:text-gray-500">Awesome Brand Ad Here</span>
+              <div className="w-full min-h-[140px] bg-gray-100 rounded-lg flex items-center justify-center mb-6 dark:bg-gray-700">
+                <script async={true} data-cfasync="false" src="//pl28169476.effectivegatecpm.com/bf14c3f69126b5523ffdcc13d6adae27/invoke.js"></script>
+                <div id="container-bf14c3f69126b5523ffdcc13d6adae27"></div>
               </div>
               <h3 className="text-xl font-bold mb-2 dark:text-white">Wait for your download...</h3>
               <p className="text-gray-500 mb-6 dark:text-gray-400">Preparing your high-quality file.</p>
