@@ -261,9 +261,9 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
                     p-4 md:p-6 rounded-2xl border-3 transition-all duration-300 flex flex-col items-center justify-center gap-1 md:gap-2
                     ${selectedVibe === vibe.id
                       ? 'border-vireo-pink bg-vireo-pink/10 scale-105 shadow-lg'
-                      : 'border-gray-200 hover:border-vireo-teal hover:bg-vireo-teal/5 hover:scale-105'
+                      : 'border-gray-200 bg-white hover:border-vireo-teal hover:bg-vireo-teal/5 hover:scale-105 shadow-md hover:shadow-lg'
                     }
-                    dark:border-gray-700 dark:hover:border-vireo-teal
+                    dark:border-gray-700 dark:bg-gray-800 dark:hover:border-vireo-teal
                   `}
                 >
                   <span className="text-3xl md:text-4xl">{vibe.emoji}</span>
