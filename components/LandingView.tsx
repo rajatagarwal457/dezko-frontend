@@ -202,8 +202,8 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
               )}
             </div>
           ) : (
-            <div className="w-full pointer-events-auto cursor-default" onClick={(e) => e.stopPropagation()}>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+            <div className="w-full h-full overflow-y-auto pointer-events-auto cursor-default px-2" onClick={(e) => e.stopPropagation()}>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full pb-4">
                 {clips.map((clip) => (
                   <div key={clip.id} className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden group/item shadow-sm">
                     <video src={clip.previewUrl} className="w-full h-full object-cover" />
