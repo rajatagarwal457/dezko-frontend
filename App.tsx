@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentRender, setCurrentRender] = useState<VideoRender | null>(null);
+  const [currentFilename, setCurrentFilename] = useState<string | null>(null);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -31,40 +32,71 @@ const App: React.FC = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const handleStartProcessing = async (clips: UploadedClip[]) => {
+  const handleStartProcessing = async (sessionId: string, fileNames: string[], clipNames: string[], vibe?: string) => {
     if (!isLoaded) return;
     if (!isSignedIn || !user) {
       alert("Please sign in to upload videos.");
       return;
     }
-    setUploadedClips(clips);
     setIsProcessing(true);
+    setCurrentState(AppState.PROCESSING);
 
-    // Upload and generate in background
+    // Upload already happened in LandingView, skip directly to generation
     (async () => {
       try {
-        // 1. Upload Videos
-        const files = clips.map(c => c.file);
-        const uploadResult = await api.uploadVideos(files, user.id);
+        // Generate Video (backend returns immediately with filename)
+        const result = await api.generateVideo(sessionId, fileNames, vibe);
 
-        // Upload complete - redirect to Dashboard immediately
-
-        // 2. Generate Video (backend returns immediately with filename)
-        const result = await api.generateVideo(uploadResult.session_id, uploadResult.files);
-
-        // 3. Save render with actual filename
-        const render: VideoRender = {
+        // Save render with actual filename
+        const baseRender: VideoRender = {
           id: result.filename,
           filename: result.filename,
           status: 'generating',
           createdAt: Date.now(),
-          clipNames: clips.map(c => c.name),
+          clipNames: clipNames,
           userId: user.id,
           videoUrl: result.video_url
         };
-        videoStore.saveVideoRender(render);
-        setCurrentState(AppState.DASHBOARD);
-        setIsProcessing(false);
+        videoStore.saveVideoRender(baseRender);
+        setCurrentRender(baseRender);
+        setCurrentFilename(result.filename);
+
+        // Poll until the output video is actually available
+        const pollIntervalMs = 3000;
+        const maxAttempts = 40; // ~2 minutes
+        let attempts = 0;
+
+        const pollForReady = async () => {
+          attempts += 1;
+          try {
+            const status = await api.checkVideoStatus(result.filename, result.video_url);
+            if (status.ready) {
+              const completedRender: VideoRender = {
+                ...baseRender,
+                status: 'completed',
+                videoUrl: result.video_url || baseRender.videoUrl,
+              };
+              videoStore.saveVideoRender(completedRender);
+              setCurrentRender(completedRender);
+              setOutputVideoUrl(completedRender.videoUrl || api.getVideoUrl(completedRender.filename));
+              setIsProcessing(false);
+              setCurrentState(AppState.RESULT);
+              return;
+            }
+          } catch (err) {
+            console.error('Error checking video status', err);
+          }
+
+          if (attempts < maxAttempts) {
+            setTimeout(pollForReady, pollIntervalMs);
+          } else {
+            // Give up after maxAttempts but still navigate to dashboard so user can check later
+            setIsProcessing(false);
+            setCurrentState(AppState.DASHBOARD);
+          }
+        };
+
+        pollForReady();
 
       } catch (error) {
         console.error("Error processing video:", error);
@@ -76,10 +108,7 @@ const App: React.FC = () => {
   };
 
   const handleProcessingComplete = () => {
-    // This is called by ProcessingView's timer. 
-    // We ignore it now because we control transition based on API success.
-    // Or we could use it to ensure minimum animation time.
-    // For now, let's just let the API control the flow.
+    // No-op: we now control transition based on actual video availability.
   };
 
   const handleReset = () => {
@@ -159,11 +188,12 @@ const App: React.FC = () => {
             onStartProcessing={handleStartProcessing}
             isSignedIn={isSignedIn}
             isProcessing={isProcessing}
+            userId={user?.id}
           />
         )}
 
         {currentState === AppState.PROCESSING && (
-          <ProcessingView onComplete={handleProcessingComplete} />
+          <ProcessingView />
         )}
 
         {currentState === AppState.DASHBOARD && (
@@ -178,6 +208,7 @@ const App: React.FC = () => {
             clips={uploadedClips}
             videoUrl={outputVideoUrl}
             onReset={handleReset}
+            onViewGallery={handleGoToDashboard}
           />
         )}
 

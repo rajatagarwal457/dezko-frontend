@@ -72,10 +72,11 @@ export const api = {
         };
     },
 
-    async generateVideo(sessionId: string, fileNames: string[]): Promise<GenerateResponse> {
+    async generateVideo(sessionId: string, fileNames: string[], vibe?: string): Promise<GenerateResponse> {
         const body = {
             sessionId: sessionId,
-            fileNames: fileNames
+            fileNames: fileNames,
+            ...(vibe && { vibe })
         };
         const response = await fetch(`${API_BASE_URL}/generate`, {
             method: 'POST',

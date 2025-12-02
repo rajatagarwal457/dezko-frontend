@@ -9,9 +9,10 @@ interface ResultViewProps {
   clips: UploadedClip[];
   videoUrl: string | null;
   onReset: () => void;
+  onViewGallery: () => void;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => {
+const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset, onViewGallery }) => {
   const [showAd, setShowAd] = useState(false);
   const [adTimer, setAdTimer] = useState(AD_DURATION_SEC);
   const [videoTitle, setVideoTitle] = useState("Your Vireo Story");
@@ -142,6 +143,14 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset }) => 
         <button onClick={onReset} className="text-gray-400 hover:text-vireo-teal underline text-sm">
           Make another one
         </button>
+        <div className="mt-3">
+          <button
+            onClick={onViewGallery}
+            className="text-gray-400 hover:text-vireo-teal underline text-sm"
+          >
+            View gallery
+          </button>
+        </div>
       </div>
 
       {/* Ad Modal */}
