@@ -1,67 +1,185 @@
-import React, { useEffect, useState } from 'react';
-import { PROCESSING_MESSAGES, PROCESSING_DURATION_MS } from '../constants';
-import VireoBird from './VireoBird';
+import React from 'react';
+import styled from 'styled-components';
 
-interface ProcessingViewProps {
-  onComplete: () => void;
-}
-
-const ProcessingView: React.FC<ProcessingViewProps> = ({ onComplete }) => {
-  const [messageIndex, setMessageIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    // Message cycling
-    const messageInterval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % PROCESSING_MESSAGES.length);
-    }, 2000);
-
-    // Progress bar and completion
-    const startTime = Date.now();
-    const progressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const newProgress = Math.min((elapsed / PROCESSING_DURATION_MS) * 100, 100);
-      setProgress(newProgress);
-
-      if (elapsed >= PROCESSING_DURATION_MS) {
-        clearInterval(messageInterval);
-        clearInterval(progressInterval);
-        onComplete();
-      }
-    }, 50);
-
-    return () => {
-      clearInterval(messageInterval);
-      clearInterval(progressInterval);
-    };
-  }, [onComplete]);
-
+const Loader: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-2xl mx-auto p-8 animate-fade-in">
-      <div className="relative mb-12">
-        {/* Decorative elements behind bird */}
-        <div className="absolute -top-10 -left-10 w-20 h-20 bg-vireo-yellow rounded-full opacity-50 blur-xl animate-pulse"></div>
-        <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-vireo-pink rounded-full opacity-30 blur-xl animate-pulse delay-75"></div>
+    <>
+      <StyledWrapper>
+        <div className="Strich1">
+          <div className="Strich2">
+            <div className="bubble" />
+            <div className="bubble1" />
+            <div className="bubble2" />
+            <div className="bubble3" />
+            <div className="bubble4" />
+          </div>
+        </div>
+      </StyledWrapper>
 
-        <VireoBird isCooking className="scale-150" />
+      <div className="text-center mt-4 text-gray-500">
+        Loading...
       </div>
-
-      <h2 className="text-3xl font-bold text-vireo-dark mb-4 text-center min-h-[80px] transition-all duration-300 dark:text-white">
-        {PROCESSING_MESSAGES[messageIndex]}
-      </h2>
-
-      <div className="w-full max-w-md bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner mt-4 dark:bg-gray-700">
-        <div
-          className="bg-gradient-to-r from-vireo-teal to-vireo-purple h-full rounded-full transition-all duration-75 ease-linear"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      <p className="mt-4 text-gray-500 font-medium animate-pulse dark:text-gray-400">
-        {Math.round(progress)}%
-      </p>
-    </div>
+    </>
   );
 };
 
-export default ProcessingView;
+const StyledWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  min-height: 20vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @keyframes dropAndShift {
+    0% {
+      transform: translate(0px, 15px);
+    }
+    16.67% {
+      transform: translate(80px, 13px);
+    }
+    33.34% {
+      transform: translate(40px, 10px);
+    }
+    50.01% {
+      transform: translate(40px, -30px);
+    }
+    66.68% {
+      transform: translate(40px, 55px);
+    }
+    83.35% {
+      transform: translate(40px, 10px);
+    }
+    100% {
+      transform: translate(0px, 15px);
+    }
+  }
+  @keyframes bubbleGlint {
+    0% {
+      top: 3px;
+      left: 4px;
+      opacity: 0;
+    }
+    8.335% {
+      top: 6px;
+      left: 6px;
+      opacity: 0.5;
+    }
+    16.67% {
+      top: 3px;
+      left: 4px;
+      opacity: 0;
+    }
+    33.34% {
+      top: 3px;
+      left: 4px;
+      opacity: 0.5;
+    }
+    50.01% {
+      top: 3px;
+      left: 4px;
+      opacity: 0;
+    }
+    58.345% {
+      top: 6px;
+      left: 6px;
+      opacity: 0.5;
+    }
+    66.68% {
+      top: 3px;
+      left: 4px;
+      opacity: 0;
+    }
+    83.35% {
+      top: 6px;
+      left: 6px;
+      opacity: 0.5;
+    }
+    100% {
+      top: 3px;
+      left: 4px;
+      opacity: 0;
+    }
+  }
+
+  .Strich1 {
+    position: absolute;
+    width: 130px;
+    height: 50px;
+    background: #000;
+    border-radius: 25px;
+    transform: rotate(45deg);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    z-index: 0;
+  }
+  .Strich2 {
+    position: absolute;
+    width: 130px;
+    height: 50px;
+    background: #000;
+    border-radius: 25px;
+    transform: rotate(-90deg);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    z-index: 0;
+  }
+
+  .bubble {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffb3c1, #e64980, #ff8787);
+    animation: dropAndShift 5s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .bubble1 {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #edb3ff, #ac49e6, #fb87ff);
+    border-radius: 50%;
+    left: 8px;
+    animation: dropAndShift 6s ease-in-out infinite;
+    z-index: 2;
+  }
+  .bubble2 {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #b3d8ff, #4963e6, #87a7ff);
+    border-radius: 50%;
+    left: 12px;
+    animation: dropAndShift 4s ease-in-out infinite;
+    z-index: 3;
+  }
+  .bubble3 {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #b3ffbc, #35a32f, #75ba61);
+    border-radius: 50%;
+    left: 10px;
+    animation: dropAndShift 7s ease-in-out infinite;
+    z-index: 4;
+  }
+
+  .bubble4 {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #fff3b3, #e6c049, #ffe787);
+    border-radius: 50%;
+    left: 18px;
+    animation: dropAndShift 5.5s ease-in-out infinite;
+    z-index: 5;
+  }
+`;
+
+export default Loader;
