@@ -127,24 +127,24 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
     setSelectedVibe(vibeId);
   };
 
-  const handleMakeMainCharacter = async () => {
+  const handleMakeMainCharacter = () => {
     if (!selectedVibe) return;
 
-    // Queue the generation - wait for upload to finish if needed
     const clipNames = clips.map(c => c.name);
 
-    // Wait for upload to complete in the background
-    const waitForUpload = async () => {
+    // Start background process to wait for upload and then call onStartProcessing
+    const waitForUploadAndProcess = async () => {
+      // Wait for upload to complete in the background
       while (isUploading || !uploadResult) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      return uploadResult;
+      if (uploadResult) {
+        onStartProcessing(uploadResult.session_id, uploadResult.files, clipNames, selectedVibe);
+      }
     };
 
-    const result = await waitForUpload();
-    if (result) {
-      onStartProcessing(result.session_id, result.files, clipNames, selectedVibe);
-    }
+    // Fire and forget - don't await
+    waitForUploadAndProcess();
   };
 
   return (
@@ -313,11 +313,9 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
               variant="primary"
               className="text-xl px-12 py-5 shadow-vireo-pink/40 shadow-xl"
               onClick={handleMakeMainCharacter}
-              disabled={isProcessing || !selectedVibe}
+              disabled={!selectedVibe}
             >
-              {isProcessing
-                ? 'Starting generation...'
-                : 'Make me the main character ✨'}
+              Make me the main character ✨
             </Button>
           </div>
         )}
