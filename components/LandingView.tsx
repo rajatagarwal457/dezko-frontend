@@ -7,7 +7,7 @@ import { UploadCloud, Film, X, Plus, Sparkles } from 'lucide-react';
 import { api } from '../services/api';
 
 interface LandingViewProps {
-  onStartProcessing: (sessionId: string, fileNames: string[], clipNames: string[], vibe?: string) => void;
+  onStartProcessing: (sessionIdOrPromise: string | Promise<{ session_id: string; files: string[] }>, fileNames: string[], clipNames: string[], vibe?: string) => void;
   isSignedIn?: boolean | undefined;
   isProcessing?: boolean;
   userId?: string;
@@ -141,19 +141,22 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
 
     const clipNames = clips.map(c => c.name);
 
-    // Start background process to wait for upload and then call onStartProcessing
-    const waitForUploadAndProcess = async () => {
-      // Wait for upload to complete in the background using refs
-      while (isUploadingRef.current || !uploadResultRef.current) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      if (uploadResultRef.current) {
-        onStartProcessing(uploadResultRef.current.session_id, uploadResultRef.current.files, clipNames, selectedVibe);
-      }
-    };
+    // Create a promise that resolves when upload is complete
+    const uploadPromise = new Promise<{ session_id: string; files: string[] }>((resolve) => {
+      const checkUpload = () => {
+        if (uploadResultRef.current && !isUploadingRef.current) {
+          resolve(uploadResultRef.current);
+        } else {
+          setTimeout(checkUpload, 100);
+        }
+      };
+      checkUpload();
+    });
 
-    // Fire and forget - don't await
-    waitForUploadAndProcess();
+    // Call onStartProcessing immediately with the promise
+    // This will transition to processing view right away
+    // The generate API call will wait for upload to finish
+    onStartProcessing(uploadPromise, [], clipNames, selectedVibe);
   };
 
   return (

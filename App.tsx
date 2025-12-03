@@ -32,7 +32,12 @@ const App: React.FC = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const handleStartProcessing = async (sessionId: string, fileNames: string[], clipNames: string[], vibe?: string) => {
+  const handleStartProcessing = async (
+    sessionIdOrPromise: string | Promise<{ session_id: string; files: string[] }>,
+    fileNames: string[],
+    clipNames: string[],
+    vibe?: string
+  ) => {
     if (!isLoaded) return;
     if (!isSignedIn || !user) {
       alert("Please sign in to upload videos.");
@@ -44,8 +49,21 @@ const App: React.FC = () => {
     // Upload already happened in LandingView, skip directly to generation
     (async () => {
       try {
+        // Wait for upload if it's a promise
+        let sessionId: string;
+        let actualFileNames: string[];
+
+        if (typeof sessionIdOrPromise === 'string') {
+          sessionId = sessionIdOrPromise;
+          actualFileNames = fileNames;
+        } else {
+          const uploadData = await sessionIdOrPromise;
+          sessionId = uploadData.session_id;
+          actualFileNames = uploadData.files;
+        }
+
         // Generate Video (backend returns immediately with filename)
-        const result = await api.generateVideo(sessionId, fileNames, vibe);
+        const result = await api.generateVideo(sessionId, actualFileNames, vibe);
 
         // Save render with actual filename
         const baseRender: VideoRender = {
