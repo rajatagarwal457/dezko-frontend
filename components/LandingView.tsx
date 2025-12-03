@@ -41,7 +41,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
   const isUploadingRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFiles = (fileList: FileList | null) => {
+  const handleFiles = async (fileList: FileList | null) => {
     if (!isSignedIn) return;
     if (!fileList) return;
 
@@ -63,10 +63,15 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
         continue;
       }
 
-      const previewUrl = URL.createObjectURL(file);
+      // Convert File to Blob immediately to prevent mobile upload errors
+      // This ensures the file data is captured and won't be affected by file system changes
+      const blob = new Blob([file], { type: file.type });
+      const blobFile = new File([blob], file.name, { type: file.type });
+
+      const previewUrl = URL.createObjectURL(blobFile);
       newClips.push({
         id: Math.random().toString(36).substr(2, 9),
-        file,
+        file: blobFile,
         previewUrl,
         name: file.name
       });
