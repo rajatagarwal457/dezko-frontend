@@ -63,15 +63,19 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
         continue;
       }
 
-      // Convert File to Blob immediately to prevent mobile upload errors
-      // This ensures the file data is captured and won't be affected by file system changes
-      const blob = new Blob([file], { type: file.type });
-      const blobFile = new File([blob], file.name, { type: file.type });
+      // Read file data immediately to prevent mobile upload errors
+      // This ensures the file data is captured in memory before any delays
+      const arrayBuffer = await file.arrayBuffer();
+      const blob = new Blob([arrayBuffer], { type: file.type });
+      const newFile = new File([blob], file.name, {
+        type: file.type,
+        lastModified: file.lastModified
+      });
 
-      const previewUrl = URL.createObjectURL(blobFile);
+      const previewUrl = URL.createObjectURL(newFile);
       newClips.push({
         id: Math.random().toString(36).substr(2, 9),
-        file: blobFile,
+        file: newFile,
         previewUrl,
         name: file.name
       });
