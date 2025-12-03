@@ -35,6 +35,10 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<{ session_id: string; files: string[] } | null>(null);
+
+  // Refs to track upload state for the background polling
+  const uploadResultRef = useRef<{ session_id: string; files: string[] } | null>(null);
+  const isUploadingRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = (fileList: FileList | null) => {
@@ -108,16 +112,21 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
     // Show vibe picker immediately
     setShowVibePicker(true);
     setIsUploading(true);
+    isUploadingRef.current = true;
 
     // Start upload in background
     try {
       const files = clips.map(c => c.file);
       const result = await api.uploadVideos(files, userId);
       setUploadResult(result);
+      uploadResultRef.current = result;
       setIsUploading(false);
+      isUploadingRef.current = false;
     } catch (error) {
       console.error('Upload failed:', error);
       setIsUploading(false);
+      isUploadingRef.current = false;
+      uploadResultRef.current = null;
       alert('Upload failed. Please try again.');
       setShowVibePicker(false);
     }
@@ -134,12 +143,12 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
 
     // Start background process to wait for upload and then call onStartProcessing
     const waitForUploadAndProcess = async () => {
-      // Wait for upload to complete in the background
-      while (isUploading || !uploadResult) {
+      // Wait for upload to complete in the background using refs
+      while (isUploadingRef.current || !uploadResultRef.current) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      if (uploadResult) {
-        onStartProcessing(uploadResult.session_id, uploadResult.files, clipNames, selectedVibe);
+      if (uploadResultRef.current) {
+        onStartProcessing(uploadResultRef.current.session_id, uploadResultRef.current.files, clipNames, selectedVibe);
       }
     };
 
