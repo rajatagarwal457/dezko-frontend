@@ -11,6 +11,7 @@ interface LandingViewProps {
   isSignedIn?: boolean | undefined;
   isProcessing?: boolean;
   userId?: string;
+  userName?: string;
 }
 
 type Vibe = {
@@ -28,7 +29,7 @@ const VIBES: Vibe[] = [
   { id: '2025-throwback', label: '2025 Throwback', emoji: '🔁' },
 ];
 
-const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn, isProcessing = false, userId }) => {
+const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn, isProcessing = false, userId, userName }) => {
   const [clips, setClips] = useState<UploadedClip[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [showVibePicker, setShowVibePicker] = useState(false);
@@ -113,8 +114,8 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
   };
 
   const handleUploadClick = async () => {
-    if (!userId) {
-      alert('User ID not available. Please sign in.');
+    if (!userId || !userName) {
+      alert('User information not available. Please sign in.');
       return;
     }
 
@@ -126,7 +127,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
     // Start upload in background
     try {
       const files = clips.map(c => c.file);
-      const result = await api.uploadVideos(files, userId);
+      const result = await api.uploadVideos(files, userName, userId);
       setUploadResult(result);
       uploadResultRef.current = result;
       setIsUploading(false);

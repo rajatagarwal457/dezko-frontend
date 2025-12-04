@@ -35,10 +35,12 @@ export const api = {
         return response.json();
     },
 
-    async uploadVideos(files: File[], userId: string): Promise<{ message: string; files: string[]; session_id: string }> {
-        // 1. Generate Session ID: {userId}-{uuid}
+    async uploadVideos(files: File[], userName: string, userId: string): Promise<{ message: string; files: string[]; session_id: string }> {
+        // 1. Generate Session ID: {userName}-{uuid}
+        // Clean userName to make it URL-safe (remove spaces, special chars)
+        const cleanUserName = userName.replace(/[^a-zA-Z0-9]/g, '_');
         const uuid = crypto.randomUUID();
-        const sessionId = `${userId}-${uuid}`;
+        const sessionId = `${cleanUserName}-${uuid}`;
 
         // 2. Upload each file using Presigned URL
         const uploadPromises = files.map(async (file) => {

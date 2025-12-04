@@ -207,6 +207,7 @@ const App: React.FC = () => {
             isSignedIn={isSignedIn}
             isProcessing={isProcessing}
             userId={user?.id}
+            userName={user?.fullName || user?.firstName || user?.username || 'User'}
           />
         )}
 
