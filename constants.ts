@@ -12,5 +12,5 @@ export const PROCESSING_DURATION_MS = 600;
 export const AD_DURATION_SEC = 15;
 
 // Quota & Payment
-export const FREE_GENERATION_LIMIT = 5;
+export const FREE_GENERATION_LIMIT = 2;
 export const PREMIUM_PRICE_INR = 1; // ₹100 ≈ $1 USD
