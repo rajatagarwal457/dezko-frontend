@@ -151,4 +151,38 @@ export const api = {
     getVideoUrl(filename: string): string {
         return `${API_BASE_URL}/outputs/${filename}`;
     },
+
+    /**
+     * Get user quota status from backend
+     */
+    async getUserQuota(userId: string): Promise<{ generationCount: number; isPremium: boolean }> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/user-quota/${userId}`);
+            if (!response.ok) {
+                // If endpoint doesn't exist yet, return defaults
+                return { generationCount: 0, isPremium: false };
+            }
+            return response.json();
+        } catch (error) {
+            console.error('Failed to fetch user quota:', error);
+            return { generationCount: 0, isPremium: false };
+        }
+    },
+
+    /**
+     * Sync local quota count to backend
+     */
+    async syncQuota(userId: string, generationCount: number): Promise<void> {
+        try {
+            await fetch(`${API_BASE_URL}/sync-quota`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId, generationCount }),
+            });
+        } catch (error) {
+            console.error('Failed to sync quota:', error);
+        }
+    },
 };

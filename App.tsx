@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Moon, Sun, LayoutDashboard } from 'lucide-react';
-import { AppState, UploadedClip, VideoRender } from './types';
+import { AppState, UploadedClip, VideoRender, UserQuota } from './types';
 import LandingView from './components/LandingView';
 import ProcessingView from './components/ProcessingView';
 import ResultView from './components/ResultView';
 import DashboardView from './components/DashboardView';
 import VireoBird from './components/VireoBird';
+import PaymentModal from './components/PaymentModal';
+import QuotaIndicator from './components/QuotaIndicator';
 import { api } from './services/api';
 import { videoStore } from './services/videoStore';
+import { quotaStore } from './services/quotaStore';
 
 const App: React.FC = () => {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -19,6 +22,27 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentRender, setCurrentRender] = useState<VideoRender | null>(null);
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
+
+  // Quota state
+  const [userQuota, setUserQuota] = useState<UserQuota | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  // Initialize and sync quota when user signs in
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user) {
+      // Load local quota
+      const localQuota = quotaStore.getUserQuota(user.id);
+      setUserQuota(localQuota);
+
+      // Sync with backend (async, non-blocking)
+      api.getUserQuota(user.id).then(backendQuota => {
+        const syncedQuota = quotaStore.syncFromBackend(user.id, backendQuota);
+        setUserQuota(syncedQuota);
+      }).catch(err => {
+        console.error('Failed to sync quota from backend:', err);
+      });
+    }
+  }, [isLoaded, isSignedIn, user]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -64,6 +88,12 @@ const App: React.FC = () => {
 
         // Generate Video (backend returns immediately with filename)
         const result = await api.generateVideo(sessionId, actualFileNames, vibe);
+
+        // Increment generation count after successful generation
+        const updatedQuota = quotaStore.incrementGenerationCount(user.id);
+        setUserQuota(updatedQuota);
+        // Sync to backend
+        api.syncQuota(user.id, updatedQuota.generationCount);
 
         // Save render with actual filename
         const baseRender: VideoRender = {
@@ -152,6 +182,19 @@ const App: React.FC = () => {
     setCurrentState(AppState.LANDING);
   };
 
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    // Refresh quota state
+    if (user) {
+      const updatedQuota = quotaStore.getUserQuota(user.id);
+      setUserQuota(updatedQuota);
+    }
+  };
+
+  const handleShowPaymentModal = () => {
+    setShowPaymentModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-vireo-offwhite font-sans text-vireo-dark overflow-x-hidden relative dark:bg-gray-900 dark:text-white transition-colors duration-300">
 
@@ -176,6 +219,13 @@ const App: React.FC = () => {
             {isDarkMode ? <Sun className="w-6 h-6 text-yellow-400" /> : <Moon className="w-6 h-6 text-vireo-dark" />}
           </button>
           <SignedIn>
+            {userQuota && (
+              <QuotaIndicator
+                remainingGenerations={quotaStore.getRemainingGenerations(user?.id || '')}
+                isPremium={userQuota.isPremium}
+                onClick={handleShowPaymentModal}
+              />
+            )}
             <button
               onClick={handleGoToDashboard}
               className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -208,6 +258,9 @@ const App: React.FC = () => {
             isProcessing={isProcessing}
             userId={user?.id}
             userName={user?.fullName || user?.firstName || user?.username || 'User'}
+            userEmail={user?.primaryEmailAddress?.emailAddress}
+            canGenerate={userQuota ? quotaStore.canGenerate(user?.id || '') : true}
+            onShowPaymentModal={handleShowPaymentModal}
           />
         )}
 
@@ -232,6 +285,19 @@ const App: React.FC = () => {
         )}
 
       </main>
+
+      {/* Payment Modal */}
+      {user && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          onPaymentSuccess={handlePaymentSuccess}
+          userId={user.id}
+          userName={user.fullName || user.firstName || user.username || 'User'}
+          userEmail={user.primaryEmailAddress?.emailAddress}
+          remainingGenerations={quotaStore.getRemainingGenerations(user.id)}
+        />
+      )}
 
       {/* Background Decor */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">

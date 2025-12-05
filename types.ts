@@ -28,3 +28,10 @@ export interface VideoRender {
   userId: string;
   videoUrl?: string;
 }
+
+export interface UserQuota {
+  userId: string;
+  generationCount: number;
+  isPremium: boolean;
+  premiumSince?: number;
+}
