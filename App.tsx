@@ -199,7 +199,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-vireo-offwhite font-sans text-vireo-dark overflow-x-hidden relative dark:bg-gray-900 dark:text-white transition-colors duration-300">
 
       {/* Navbar / Logo Area */}
-      <header className="w-full p-6 flex items-center justify-between max-w-7xl mx-auto z-50 relative">
+      <header className="w-full p-3 sm:p-6 flex items-center justify-between max-w-7xl mx-auto z-50 relative">
         <div
           className="flex items-center gap-3 cursor-pointer group"
           onClick={handleReset}
@@ -210,7 +210,7 @@ const App: React.FC = () => {
           </span>
         </div>
         {/* Placeholder for menu or login */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={toggleDarkMode}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"

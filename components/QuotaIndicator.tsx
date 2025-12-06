@@ -15,9 +15,10 @@ const QuotaIndicator: React.FC<QuotaIndicatorProps> = ({
 }) => {
     if (isPremium) {
         return (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-vireo-teal to-vireo-purple text-white rounded-full text-sm font-bold">
-                <Sparkles className="w-4 h-4" />
-                Premium
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-vireo-teal to-vireo-purple text-white rounded-full text-xs sm:text-sm font-bold">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Premium</span>
+                <span className="inline xs:hidden">Pro</span>
             </div>
         );
     }
@@ -29,7 +30,7 @@ const QuotaIndicator: React.FC<QuotaIndicatorProps> = ({
         <button
             onClick={onClick}
             className={`
-                flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold transition-all
+                flex items-center gap-1.5 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all
                 ${isEmpty
                     ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
                     : isLow
@@ -39,7 +40,7 @@ const QuotaIndicator: React.FC<QuotaIndicatorProps> = ({
             `}
             title={isEmpty ? 'Upgrade to continue' : `${remainingGenerations} of ${FREE_GENERATION_LIMIT} free videos left`}
         >
-            <Zap className="w-4 h-4" />
+            <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {isEmpty ? 'Upgrade' : `${remainingGenerations}/${FREE_GENERATION_LIMIT}`}
         </button>
     );
