@@ -299,6 +299,11 @@ const App: React.FC = () => {
         />
       )}
 
+      {/* Footer */}
+      <footer className="w-full py-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p>Made with ❤️ by Noah and Rajat</p>
+      </footer>
+
       {/* Background Decor */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] bg-vireo-teal rounded-full opacity-5 blur-3xl"></div>
