@@ -12,6 +12,9 @@ interface LandingViewProps {
   isProcessing?: boolean;
   userId?: string;
   userName?: string;
+  userEmail?: string;
+  canGenerate?: boolean;
+  onShowPaymentModal?: () => void;
 }
 
 type Vibe = {
@@ -29,7 +32,7 @@ const VIBES: Vibe[] = [
   { id: '2025-throwback', label: '2025 Throwback', emoji: '🔁' },
 ];
 
-const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn, isProcessing = false, userId, userName }) => {
+const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn, isProcessing = false, userId, userName, userEmail, canGenerate = true, onShowPaymentModal }) => {
   const [clips, setClips] = useState<UploadedClip[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [showVibePicker, setShowVibePicker] = useState(false);
@@ -148,6 +151,12 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
 
   const handleMakeMainCharacter = () => {
     if (!selectedVibe) return;
+
+    // Check if user can generate (has free tries left or is premium)
+    if (!canGenerate) {
+      onShowPaymentModal?.();
+      return;
+    }
 
     const clipNames = clips.map(c => c.name);
 
