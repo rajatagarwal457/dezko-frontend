@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UploadedClip } from '../types';
 import Button from './Button';
-import { Share2, Download } from 'lucide-react';
+import { Share2, Download, CirclePlus } from 'lucide-react';
 import { generateCreativeTitle } from '../services/geminiService';
 import VideoLoader from './VideoLoader';
 
@@ -123,7 +123,7 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset, onVie
 
       <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
         <Button onClick={handleShare} variant="secondary" size="lg" className="w-full md:w-auto">
-          <Share2 className="w-5 h-5" />
+          <CirclePlus className="w-5 h-5" />
           Post on Instagram
         </Button>
         <Button onClick={handleDownloadClick} variant="primary" size="lg" className="w-full md:w-auto">
