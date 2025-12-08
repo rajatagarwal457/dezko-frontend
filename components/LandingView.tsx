@@ -217,7 +217,8 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
             ref={fileInputRef}
             className="hidden"
             multiple
-            accept="video/mp4,video/quicktime,video/x-m4v"
+            // accept="video/mp4,video/quicktime,video/x-m4v"
+            accept="video/*"
             onChange={(e) => handleFiles(e.target.files)}
           />
 
