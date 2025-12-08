@@ -3,6 +3,7 @@ import { UploadedClip } from '../types';
 import Button from './Button';
 import { Share2, Download } from 'lucide-react';
 import { generateCreativeTitle } from '../services/geminiService';
+import VideoLoader from './VideoLoader';
 
 interface ResultViewProps {
   clips: UploadedClip[];
@@ -14,6 +15,7 @@ interface ResultViewProps {
 const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset, onViewGallery }) => {
   const [videoTitle, setVideoTitle] = useState("Your Vireo Story");
   const [cachedVideoBlob, setCachedVideoBlob] = useState<Blob | null>(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
 
   // Determine the source to play. Use the generated video URL if available, otherwise fallback to first clip
   const previewSource = videoUrl || (clips.length > 0 ? clips[0].previewUrl : '');
@@ -27,6 +29,13 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset, onVie
     };
     fetchTitle();
   }, [clips]);
+
+  // Reset loading state when video URL changes
+  useEffect(() => {
+    if (videoUrl) {
+      setIsVideoLoading(true);
+    }
+  }, [videoUrl]);
 
   // Cache the video blob when component mounts (for sharing)
   useEffect(() => {
@@ -94,6 +103,9 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset, onVie
 
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-4 border-vireo-teal dark:border-vireo-teal/50 p-2 md:p-4 mb-8 max-w-md mx-auto">
         <div className="relative aspect-[9/16] bg-black rounded-2xl overflow-hidden group">
+          {/* Custom Video Loader */}
+          {isVideoLoading && <VideoLoader />}
+
           <video
             src={previewSource}
             className="w-full h-full object-contain"
@@ -101,6 +113,8 @@ const ResultView: React.FC<ResultViewProps> = ({ clips, videoUrl, onReset, onVie
             autoPlay
             loop
             playsInline
+            onCanPlayThrough={() => setIsVideoLoading(false)}
+            onLoadedData={() => setIsVideoLoading(false)}
           />
           {/* Overlay Title */}
 
