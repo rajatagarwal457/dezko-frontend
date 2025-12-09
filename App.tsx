@@ -90,10 +90,7 @@ const App: React.FC = () => {
         const result = await api.generateVideo(sessionId, actualFileNames, vibe);
 
         // Increment generation count after successful generation
-        const updatedQuota = quotaStore.incrementGenerationCount(user.id);
-        setUserQuota(updatedQuota);
-        // Sync to backend
-        api.syncQuota(user.id, updatedQuota.generationCount);
+
 
         // Save render with actual filename
         const baseRender: VideoRender = {
@@ -124,6 +121,10 @@ const App: React.FC = () => {
                 status: 'completed',
                 videoUrl: result.video_url || baseRender.videoUrl,
               };
+              const updatedQuota = quotaStore.incrementGenerationCount(user.id);
+              setUserQuota(updatedQuota);
+              // Sync to backend
+              api.syncQuota(user.id, updatedQuota.generationCount);
               videoStore.saveVideoRender(completedRender);
               setCurrentRender(completedRender);
               setOutputVideoUrl(completedRender.videoUrl || api.getVideoUrl(completedRender.filename));
