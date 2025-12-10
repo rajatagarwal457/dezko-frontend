@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Moon, Sun, LayoutDashboard } from 'lucide-react';
-import { AppState, UploadedClip, VideoRender, UserQuota } from './types';
-import LandingView from './components/LandingView';
-import ProcessingView from './components/ProcessingView';
-import ResultView from './components/ResultView';
-import DashboardView from './components/DashboardView';
-import VireoBird from './components/VireoBird';
-import PaymentModal from './components/PaymentModal';
-import QuotaIndicator from './components/QuotaIndicator';
-import { api } from './services/api';
-import { videoStore } from './services/videoStore';
-import { quotaStore } from './services/quotaStore';
+import { AppState, UploadedClip, VideoRender, UserQuota } from '../types';
+import LandingView from '../components/LandingView';
+import ProcessingView from '../components/ProcessingView';
+import ResultView from '../components/ResultView';
+import DashboardView from '../components/DashboardView';
+import VireoBird from '../components/VireoBird';
+import PaymentModal from '../components/PaymentModal';
+import QuotaIndicator from '../components/QuotaIndicator';
+import { api } from '../services/api';
+import { videoStore } from '../services/videoStore';
+import { quotaStore } from '../services/quotaStore';
 
 const App: React.FC = () => {
   const { isSignedIn, isLoaded, user } = useUser();

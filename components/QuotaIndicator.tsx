@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { Sparkles, Zap } from 'lucide-react';
 import { FREE_GENERATION_LIMIT } from '../constants';

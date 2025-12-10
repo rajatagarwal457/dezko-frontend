@@ -1,0 +1,31 @@
+# Vireo
+
+> AI-powered video editor that turns raw clips into viral-ready reels instantly
+
+## What is Vireo?
+
+Vireo is a web-based AI video editor designed to help creators make viral TikToks, Instagram Reels, and YouTube Shorts without any editing skills. Upload your clips, choose a vibe, and Vireo automatically creates beat-synced, professionally edited short-form videos.
+
+## Key Features
+
+- **AI-Powered Editing**: Automatically selects the best moments from your clips
+- **Beat Synchronization**: Syncs video cuts to music beats for viral impact
+- **Multiple Vibes**: Choose from Party, Nostalgia, Cute, Hardcore, Lovey Dovey, or 2025 Throwback styles
+- **One-Click Creation**: No editing experience required
+- **Platform-Ready**: Outputs optimized for TikTok, Instagram Reels, YouTube Shorts
+
+## Use Cases
+
+- Turn vacation clips into travel reels
+- Create memory compilations from events
+- Make viral content for social media growth
+- Transform raw footage into shareable stories
+
+## Pricing
+
+- Free tier: 2 video generations
+- Premium: Unlimited lifetime access for $1 USD
+
+## Website
+
+https://editvireo.com

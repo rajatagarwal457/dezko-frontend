@@ -1,5 +1,4 @@
 import React from 'react';
-import vireoLogo from '@/vireo-animated-logo.svg';
 
 interface VireoBirdProps {
   isCooking?: boolean;
@@ -10,7 +9,7 @@ const VireoBird: React.FC<VireoBirdProps> = ({ isCooking = false, className = ""
   return (
     <div className={`relative ${className}`}>
       <img
-        src={vireoLogo}
+        src="/vireo-animated-logo.svg"
         alt="Vireo Bird"
         className={`w-full h-full object-contain ${isCooking ? 'animate-pulse' : ''}`}
       />

@@ -1,5 +1,7 @@
+'use client'
+
 import React, { useRef, useState } from 'react';
-import { SignInButton } from "@clerk/clerk-react";
+import { SignInButton } from "@clerk/nextjs";
 import { UploadedClip } from '../types';
 import { MAX_CLIPS, MAX_FILE_SIZE_MB } from '../constants';
 import Button from './Button';

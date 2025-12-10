@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { UploadedClip } from '../types';
 import Button from './Button';
