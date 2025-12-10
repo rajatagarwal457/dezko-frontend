@@ -119,7 +119,7 @@ export default function RootLayout({
                                 featureList: [
                                     'AI-powered video editing',
                                     'Automatic beat synchronization',
-                                    'TikTok reel creation',
+                                    'TikTok creation',
                                     'Instagram Reels maker',
                                     'YouTube Shorts creator',
                                     'Multiple vibe styles',
