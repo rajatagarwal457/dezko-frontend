@@ -1,7 +1,7 @@
 import { PREMIUM_PRICE_INR } from '../constants';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
 declare global {
     interface Window {

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { X, Sparkles, Check, Loader2 } from 'lucide-react';
 import { FREE_GENERATION_LIMIT, PREMIUM_PRICE_INR } from '../constants';

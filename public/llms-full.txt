@@ -1,0 +1,71 @@
+# Vireo - AI Video Editor
+
+> Transform raw video clips into viral-ready reels with AI-powered beat-synced editing
+
+## Overview
+
+Vireo (https://editvireo.com) is an AI-powered video editing platform that helps creators, influencers, and everyday users turn their raw video clips into professionally edited, viral-ready short-form content for TikTok, Instagram Reels, and YouTube Shorts.
+
+## Problem Solved
+
+Creating engaging short-form video content traditionally requires:
+- Video editing software expertise
+- Understanding of pacing and beat synchronization
+- Hours of manual editing work
+- Knowledge of what makes content "viral"
+
+Vireo eliminates all these barriers by using AI to automatically handle the creative decisions.
+
+## How It Works
+
+1. **Upload Clips**: Users upload multiple raw video clips (vacation footage, event recordings, daily moments)
+2. **Choose a Vibe**: Select from many different aesthetic styles
+3. **AI Processing**: Vireo's algorithm:
+   - Analyzes audio beats in the selected music
+   - Identifies key moments in each clip
+   - Synchronizes video cuts to beat drops
+   - Applies vibe-specific color grading and effects
+4. **Download**: Receive a polished, platform-ready reel
+
+## Technical Capabilities
+
+- Beat detection and synchronization algorithm
+- Multi-clip intelligent selection
+- Automatic moment detection
+- Cloud-based video processing
+- Support for various video formats (MP4, MOV, M4V)
+- Maximum file size: Configurable per clip
+- Maximum clips: Multiple clips per generation
+
+## Target Audience
+
+- Social media creators and influencers
+- Travelers wanting to share trip highlights
+- Event attendees (weddings, parties, concerts)
+- Parents creating family memory reels
+- Small businesses for social media marketing
+- Anyone wanting to share moments without editing skills
+
+## Pricing Model
+
+- **Free Tier**: 5 video generations at no cost
+- **Premium**: $1 USD one-time payment for unlimited lifetime access
+
+## Competitive Advantages
+
+1. **Simplicity**: No learning curve, no timeline editing
+2. **Speed**: Results in seconds, not hours
+3. **AI-Driven**: Intelligent selection beats manual editing
+4. **Affordable**: Extremely low-cost premium tier
+5. **Web-Based**: No app download required
+
+## Platform Information
+
+- Website: https://editvireo.com
+- Type: Progressive Web Application (PWA)
+- Authentication: Clerk-based user authentication
+- Payments: Razorpay integration
+
+## Contact
+
+Visit https://editvireo.com to try Vireo for free.

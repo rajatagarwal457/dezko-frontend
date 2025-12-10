@@ -1,5 +1,7 @@
+'use client'
+
 import React, { useEffect, useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/nextjs';
 import { VideoRender } from '../types';
 import { videoStore } from '../services/videoStore';
 import { api } from '../services/api';
