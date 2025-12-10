@@ -6,6 +6,16 @@ frontend:
         - npm ci
     build:
       commands:
+        - env | grep -e GEMINI_API_KEY >> .env.production
+        - env | grep -e GEMINI_API_KEY >> .env.local
+        - env | grep -e CLERK_SECRET_KEY >> .env.production
+        - env | grep -e CLERK_SECRET_KEY >> .env.local
+        - env | grep -e NEXT_PUBLIC_API_BASE_URL >> .env.production
+        - env | grep -e NEXT_PUBLIC_API_BASE_URL >> .env.local
+        - env | grep -e NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY >> .env.production
+        - env | grep -e NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY >> .env.local
+        - env | grep -e NEXT_PUBLIC_RAZORPAY_KEY_ID >> .env.production
+        - env | grep -e NEXT_PUBLIC_RAZORPAY_KEY_ID >> .env.local
         - npm run build
   artifacts:
     baseDirectory: .next
