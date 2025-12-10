@@ -137,6 +137,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStartProcessing, isSignedIn
       isUploadingRef.current = false;
     } catch (error) {
       console.error('Upload failed:', error);
+      var _ = await api.logError(error);
       setIsUploading(false);
       isUploadingRef.current = false;
       uploadResultRef.current = null;
